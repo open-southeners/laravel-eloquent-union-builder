@@ -2,8 +2,11 @@
 
 namespace OpenSoutheners\LaravelEloquentUnionBuilder\Tests;
 
-use Orchestra\Testbench\TestCase as Orchestra;
+use Laravel\Scout\ScoutServiceProvider;
 use OpenSoutheners\LaravelEloquentUnionBuilder\ServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
+use MeiliSearch\Contracts\TasksQuery;
+use Laravel\Scout\EngineManager;
 
 abstract class TestCase extends Orchestra
 {
@@ -16,7 +19,36 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            ServiceProvider::class,
+            ScoutServiceProvider::class,
         ];
+    }
+
+    /**
+     * Define environment setup.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    protected function defineEnvironment($app)
+    {
+        // Setup default database to use sqlite :memory:
+        $app['config']->set('database.default', 'testing');
+        $app['config']->set('scout.driver', 'collection');
+        $app['config']->set('database.connections.testing', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+    }
+
+    /**
+     * Define database migrations.
+     *
+     * @return void
+     */
+    protected function defineDatabaseMigrations()
+    {
+        $this->loadLaravelMigrations();
+        $this->loadMigrationsFrom(__DIR__.'/database');
     }
 }

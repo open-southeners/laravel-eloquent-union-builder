@@ -4,6 +4,7 @@ namespace OpenSoutheners\LaravelEloquentUnionBuilder;
 
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -46,17 +47,22 @@ final class UnionBuilder
      * Make new instance of UnionBuilder by the following models classes.
      *
      * @param  array<class-string<\Illuminate\Database\Eloquent\Model>>  $models
-     * @return UnionBuilder
+     * @return \OpenSoutheners\LaravelEloquentUnionBuilder\UnionBuilder
      */
     public static function from(array $models)
     {
-        $builders = [];
+        $unionBuilder = new static();
 
-        foreach ($models as $model) {
-            $builders[$model] = $model::query();
+        foreach ($models as $model => $columns) {
+            if (is_numeric($model)) {
+                $model = $columns;
+                $columns = null;
+            }
+
+            $unionBuilder->add($model::query());
         }
 
-        return new static($builders);
+        return $unionBuilder;
     }
 
     /**
@@ -64,7 +70,7 @@ final class UnionBuilder
      *
      * @param  string  $searchQuery
      * @param  array<class-string<\Illuminate\Database\Eloquent\Model>>|array<class-string<\Illuminate\Database\Eloquent\Model>, array>  $models
-     * @return UnionBuilder
+     * @return \OpenSoutheners\LaravelEloquentUnionBuilder\UnionBuilder
      */
     public static function search(string $searchQuery, array $models)
     {
@@ -76,7 +82,7 @@ final class UnionBuilder
                 $columns = null;
             }
 
-            if (! class_use($model, Searchable::class)) {
+            if (! in_array(Searchable::class, class_uses($model))) {
                 throw new Exception("Model '${model}' does not use Laravel Scout.");
             }
 
@@ -88,7 +94,7 @@ final class UnionBuilder
 
             $unionBuilder->add(
                 $model::query()->whereKey($modelSearchResultKeys->toArray()),
-                $columns ?? Schema::getColumnListing($model::getTableName())
+                $columns ?? Schema::getColumnListing((new $model)->getTable())
             );
         }
 
@@ -121,10 +127,15 @@ final class UnionBuilder
 
         foreach ($this->builders as $builder) {
             $model = get_class($builder->getModel());
-            $modelSelectedColumns = $this->selectModelsColumns[$model];
+            $modelSelectedColumns = $this->selectModelsColumns[$model]
+                ?? Schema::getColumnListing($builder->getModel()->getTable());
+
+            if (! ($builder->getConnection() instanceof SQLiteConnection)) {
+                $model = str_replace('\\', '\\\\', $model);
+            }
 
             $selectColumnsArr = [];
-            $selectColumnsArr[] = DB::raw("'".str_replace('\\', '\\\\', $model)."' as union_model_class");
+            $selectColumnsArr[] = DB::raw("'".$model."' as union_model_class");
             $selectColumnsArr = array_merge(
                 $selectColumnsArr,
                 array_map(function ($item) use ($modelSelectedColumns) {
@@ -157,9 +168,9 @@ final class UnionBuilder
     /**
      * Add Eloquent query builder to this union builder selecting the following columns.
      *
-     * @param  Builder  $builder
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @param  array  $columns
-     * @return UnionBuilder
+     * @return $this
      */
     public function add(Builder $builder, array $columns = [])
     {

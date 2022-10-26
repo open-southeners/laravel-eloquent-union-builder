@@ -23,10 +23,14 @@
         "illuminate/support": "^8.0|^9.0"
     },
     "require-dev": {
+        "laravel/scout": "^9.0",
         "nunomaduro/larastan": "^1.0",
         "phpstan/phpstan": "^1.0",
         "phpunit/phpunit": "^7.0|^9.0",
         "orchestra/testbench": "^4.0|^6.0|^7.0"
+    },
+    "suggest": {
+        "laravel/scout": "Laravel Scout for use with UnionBuilder::search() method"
     },
     "autoload": {
         "psr-4": {
@@ -40,13 +44,6 @@
     },
     "config": {
         "sort-packages": true
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "OpenSoutheners\\LaravelEloquentUnionBuilder\\ServiceProvider"
-            ]
-        }
     },
     "minimum-stability": "dev"
 }
