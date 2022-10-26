@@ -2,6 +2,7 @@
 
 namespace OpenSoutheners\LaravelEloquentUnionBuilder\Tests;
 
+use Exception;
 use OpenSoutheners\LaravelEloquentUnionBuilder\Tests\Fixtures\Post;
 use OpenSoutheners\LaravelEloquentUnionBuilder\Tests\Fixtures\Tag;
 use OpenSoutheners\LaravelEloquentUnionBuilder\Tests\Fixtures\User;
@@ -107,6 +108,14 @@ class UnionBuilderTest extends TestCase
         $this->assertCount(1, $tagsResults);
     }
 
+    public function testUnionBuilderSearchThrowsExceptionWhenNonSearchableModelFoundInArgs()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Model '".Country::class."' is invalid.");
+
+        UnionBuilder::search('hello', [Tag::class, Post::class, Country::class])->get();
+    }
+
     public function testUnionBuilderCallOnlyWhereOnPostReturnsFilteredPostsOnly()
     {
         $queryResults = UnionBuilder::from([Tag::class, Post::class])
@@ -127,5 +136,13 @@ class UnionBuilderTest extends TestCase
         });
 
         $this->assertCount(2, $tagsResults);
+    }
+
+    public function testUnionBuilderThrowsExceptionWhenNoQueryBuilderInstancesWereSent()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('No queries found for models query union.');
+
+        (new UnionBuilder())->get();
     }
 }
