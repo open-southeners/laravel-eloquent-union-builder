@@ -82,8 +82,8 @@ final class UnionBuilder
                 $columns = null;
             }
 
-            if (! in_array(Searchable::class, class_uses($model))) {
-                throw new Exception("Model '${model}' does not use Laravel Scout.");
+            if (! class_exists($model) || ! in_array(Searchable::class, class_uses($model))) {
+                throw new Exception("Model '${model}' is invalid.");
             }
 
             $modelSearchResultKeys = $model::search($searchQuery)->keys();
@@ -145,7 +145,7 @@ final class UnionBuilder
 
             $builder->select($selectColumnsArr);
 
-            $unitedBaseBuilder = is_null($unitedBaseBuilder) ? $builder->toBase() : $unitedBaseBuilder->union($builder);
+            $unitedBaseBuilder = is_null($unitedBaseBuilder) ? $builder->toBase() : $unitedBaseBuilder->union($builder->toBase());
         }
 
         if (! $unitedBaseBuilder) {
