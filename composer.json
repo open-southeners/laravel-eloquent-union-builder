@@ -1,19 +1,26 @@
 {
-    "name": "packagist_package_here",
-    "description": "and_description_here",
+    "name": "open-southeners/laravel-eloquent-union-builder",
+    "description": "Unify multiple Eloquent query builder instances into one using SQL union",
     "license": "MIT",
     "keywords": [
-        "open-southeners"
+        "open-southeners",
+        "eloquent",
+        "laravel",
+        "union-queries",
+        "models",
+        "laravel scout"
     ],
     "authors": [
         {
             "name": "Ruben Robles",
-            "email": "d8vjork@outlook.com",
+            "email": "me@d8vjork.com",
             "homepage": "https://d8vjork.com"
         }
     ],
     "require": {
-        "php": "^7.2|^8.0|^8.1"
+        "php": "^7.3|^8.0|^8.1",
+        "illuminate/database": "^8.0|^9.0",
+        "illuminate/support": "^8.0|^9.0"
     },
     "require-dev": {
         "nunomaduro/larastan": "^1.0",
@@ -23,12 +30,12 @@
     },
     "autoload": {
         "psr-4": {
-            "OpenSoutheners\\PhpPackage\\": "src"
+            "OpenSoutheners\\LaravelEloquentUnionBuilder\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "OpenSoutheners\\PhpPackage\\Tests\\": "tests"
+            "OpenSoutheners\\LaravelEloquentUnionBuilder\\Tests\\": "tests"
         }
     },
     "config": {
@@ -37,7 +44,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "OpenSoutheners\\PhpPackage\\ServiceProvider"
+                "OpenSoutheners\\LaravelEloquentUnionBuilder\\ServiceProvider"
             ]
         }
     },
