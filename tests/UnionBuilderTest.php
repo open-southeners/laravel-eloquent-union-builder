@@ -4,6 +4,7 @@ namespace OpenSoutheners\LaravelEloquentUnionBuilder\Tests;
 
 use OpenSoutheners\LaravelEloquentUnionBuilder\Tests\Fixtures\Post;
 use OpenSoutheners\LaravelEloquentUnionBuilder\Tests\Fixtures\Tag;
+use OpenSoutheners\LaravelEloquentUnionBuilder\Tests\Fixtures\User;
 use OpenSoutheners\LaravelEloquentUnionBuilder\UnionBuilder;
 
 class UnionBuilderTest extends TestCase
@@ -89,7 +90,7 @@ class UnionBuilderTest extends TestCase
 
     public function testUnionBuilderSearchReturnsResultsOfDifferentModels()
     {
-        $searchResults = UnionBuilder::search('hello', [Tag::class, Post::class])->get();
+        $searchResults = UnionBuilder::search('hello', [Tag::class, Post::class, User::class])->get();
 
         $this->assertCount(2, $searchResults);
 
@@ -104,5 +105,27 @@ class UnionBuilderTest extends TestCase
         });
 
         $this->assertCount(1, $tagsResults);
+    }
+
+    public function testUnionBuilderCallOnlyWhereOnPostReturnsFilteredPostsOnly()
+    {
+        $queryResults = UnionBuilder::from([Tag::class, Post::class])
+            ->callOnly(Post::class)
+            ->where('slug', 'hello-world')
+            ->get();
+
+        $this->assertCount(3, $queryResults);
+
+        $postsResults = $queryResults->filter(function ($result) {
+            return $result instanceof Post;
+        });
+
+        $this->assertCount(1, $postsResults);
+
+        $tagsResults = $queryResults->filter(function ($result) {
+            return $result instanceof Tag;
+        });
+
+        $this->assertCount(2, $tagsResults);
     }
 }
