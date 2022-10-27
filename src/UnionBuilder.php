@@ -112,7 +112,7 @@ final class UnionBuilder
             $unionModelClass = $result->union_model_class;
 
             return (new $unionModelClass)->forceFill(
-                Arr::only((array) $result, $this->selectModelsColumns[$unionModelClass])
+                Arr::only((array) $result, $this->selectModelsColumns[$unionModelClass] ?? [])
             );
         });
     }
