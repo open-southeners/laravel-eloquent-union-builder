@@ -117,7 +117,7 @@ class UnionBuilderTest extends TestCase
         UnionBuilder::search('hello', [Tag::class, Post::class, Country::class])->get();
     }
 
-    public function testUnionBuilderCallOnlyWhereOnPostReturnsFilteredPostsOnly()
+    public function testUnionBuilderCallingOnlyWhereOnPostReturnsFilteredPostsOnly()
     {
         $queryResults = UnionBuilder::from([Tag::class, Post::class])
             ->callingOnly(Post::class, function (Builder $query) {
