@@ -3,6 +3,7 @@
 namespace OpenSoutheners\LaravelEloquentUnionBuilder\Tests;
 
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use OpenSoutheners\LaravelEloquentUnionBuilder\Tests\Fixtures\Post;
 use OpenSoutheners\LaravelEloquentUnionBuilder\Tests\Fixtures\Tag;
 use OpenSoutheners\LaravelEloquentUnionBuilder\Tests\Fixtures\User;
@@ -119,9 +120,9 @@ class UnionBuilderTest extends TestCase
     public function testUnionBuilderCallOnlyWhereOnPostReturnsFilteredPostsOnly()
     {
         $queryResults = UnionBuilder::from([Tag::class, Post::class])
-            ->callOnly(Post::class)
-            ->where('slug', 'hello-world')
-            ->get();
+            ->callingOnly(Post::class, function (Builder $query) {
+                $query->where('slug', 'hello-world');
+            })->get();
 
         $this->assertCount(3, $queryResults);
 

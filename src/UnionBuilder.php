@@ -2,6 +2,7 @@
 
 namespace OpenSoutheners\LaravelEloquentUnionBuilder;
 
+use Closure;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\SQLiteConnection;
@@ -27,11 +28,6 @@ final class UnionBuilder
      * @var array<string, array>
      */
     protected $selectModelsColumns = [];
-
-    /**
-     * @var array<string>
-     */
-    protected $callingOnly = [];
 
     /**
      * Construct new instance of class.
@@ -177,11 +173,12 @@ final class UnionBuilder
     public function add(Builder $builder, array $columns = [])
     {
         $builderModel = $builder->getModel();
+        $builderModelClass = get_class($builder->getModel());
 
-        $this->selectModelsColumns[get_class($builderModel)] = $columns
+        $this->selectModelsColumns[$builderModelClass] = $columns
             ?: Schema::getColumnListing($builderModel->getTable());
 
-        $this->builders[] = $builder;
+        $this->builders[$builderModelClass] = $builder;
 
         return $this;
     }
@@ -190,11 +187,12 @@ final class UnionBuilder
      * Forward next call only on the specified model's builder.
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Closure  $callback
      * @return $this
      */
-    public function callOnly($model)
+    public function callingOnly(string $model, Closure $callback)
     {
-        $this->callingOnly[] = $model;
+        $callback($this->builders[$model]);
 
         return $this;
     }
@@ -209,14 +207,8 @@ final class UnionBuilder
     public function __call($method, $arguments)
     {
         foreach ($this->builders as $builder) {
-            if (! empty($this->callingOnly) && ! in_array(get_class($builder->getModel()), $this->callingOnly)) {
-                continue;
-            }
-
             $this->forwardCallTo($builder, $method, $arguments);
         }
-
-        $this->callingOnly = [];
 
         return $this;
     }
