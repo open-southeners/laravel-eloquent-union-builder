@@ -111,7 +111,9 @@ final class UnionBuilder
         return $this->getUnionBuilder()->get()->map(function ($result) {
             $unionModelClass = $result->union_model_class;
 
-            return new $unionModelClass((array) $result);
+            return (new $unionModelClass)->forceFill(
+                Arr::only((array) $result, $this->selectModelsColumns[$unionModelClass])
+            );
         });
     }
 
