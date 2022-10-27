@@ -66,9 +66,11 @@ final class UnionBuilder
      *
      * @param  string  $searchQuery
      * @param  array<class-string<\Illuminate\Database\Eloquent\Model>>|array<class-string<\Illuminate\Database\Eloquent\Model>, array>  $models
+     * @param  array<class-string<\Illuminate\Database\Eloquent\Model>>|array<class-string<\Illuminate\Database\Eloquent\Model>, array>  $models
+     * @param  \Closure|null  $callback
      * @return \OpenSoutheners\LaravelEloquentUnionBuilder\UnionBuilder
      */
-    public static function search(string $searchQuery, array $models)
+    public static function search(string $searchQuery, array $models, $callback = null)
     {
         $unionBuilder = new static();
 
@@ -82,7 +84,14 @@ final class UnionBuilder
                 throw new Exception("Model '${model}' is invalid.");
             }
 
-            $modelSearchResultKeys = $model::search($searchQuery)->keys();
+            /** @var \Laravel\Scout\Builder $scoutBuilder */
+            $scoutBuilder = $model::search($searchQuery);
+
+            if (is_callable($callback)) {
+                $callback($scoutBuilder);
+            }
+
+            $modelSearchResultKeys = $scoutBuilder->keys();
 
             if ($modelSearchResultKeys->isEmpty()) {
                 continue;
