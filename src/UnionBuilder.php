@@ -201,7 +201,9 @@ final class UnionBuilder
      */
     public function callingOnly(string $model, Closure $callback)
     {
-        $callback($this->builders[$model]);
+        if ($modelBuilder = $this->builders[$model] ?? null) {
+            $callback($this->builders[$model]);
+        }
 
         return $this;
     }
