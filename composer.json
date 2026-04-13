@@ -18,16 +18,17 @@
         }
     ],
     "require": {
-        "php": "^7.3|^8.0|^8.1",
-        "illuminate/database": "^8.0|^9.0",
-        "illuminate/support": "^8.0|^9.0"
+        "php": "^8.2",
+        "illuminate/database": "^10.0|^11.0|^12.0",
+        "illuminate/pagination": "^10.0|^11.0|^12.0",
+        "illuminate/support": "^10.0|^11.0|^12.0"
     },
     "require-dev": {
-        "laravel/scout": "^9.0",
-        "nunomaduro/larastan": "^1.0",
+        "laravel/scout": "^10.0",
+        "nunomaduro/larastan": "^2.0",
         "phpstan/phpstan": "^1.0",
-        "phpunit/phpunit": "^7.0|^9.0",
-        "orchestra/testbench": "^4.0|^6.0|^7.0"
+        "phpunit/phpunit": "^10.0|^11.0",
+        "orchestra/testbench": "^8.0|^9.0|^10.0"
     },
     "suggest": {
         "laravel/scout": "Laravel Scout for use with UnionBuilder::search() method"

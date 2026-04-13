@@ -3,10 +3,7 @@
 namespace OpenSoutheners\LaravelEloquentUnionBuilder\Tests;
 
 use Laravel\Scout\ScoutServiceProvider;
-use OpenSoutheners\LaravelEloquentUnionBuilder\ServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
-use MeiliSearch\Contracts\TasksQuery;
-use Laravel\Scout\EngineManager;
 
 abstract class TestCase extends Orchestra
 {
